@@ -37,6 +37,7 @@ router.route('/:id').delete(authController.deleteUser);
 
 
 
+
 //slug: req.params.slug burdaki :slug ile eşleşiyor.
 //Slug ekledikten sonra eğer başka modellerde slug yoksa, sayfaya tekrar geri döner. Slugı olmayanları Databaseden silmek gerekir.
 
