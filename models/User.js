@@ -21,6 +21,18 @@ const UserSchema = new Schema({
         required:true
     },
 
+    role: {
+        type: String,
+        enum: ["student",,"teacher","admin"],
+        default: "student"
+    },
+
+    courses: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course'
+    }],
+      
+
     
 
    
@@ -28,7 +40,8 @@ const UserSchema = new Schema({
     
 });
 
-
+// Şifre değiştiği için aşağıdaki middleware geçerli olmadı hatalı, (kurs ekleyince)
+/*
 UserSchema.pre('save', function(next){
     const user = this;
     bcrypt.hash(user.password, 10, (error, hash) => {
@@ -36,9 +49,26 @@ UserSchema.pre('save', function(next){
         next()
     })
 })
+*/
 
 //pre methodu databaseye kayıt etmeden önce gerçekleşmesini sağlıyor. aşağıdaki bir middleware'dir.
 
+
+//Kurs ekledikten sonra şifre değiştiği için ek middleware
+
+UserSchema.pre('save', function(next) {
+    const user = this;
+    if (!user.isModified('password')) return next();
+
+    bcrypt.genSalt(10, function(err, salt) {
+        if (err) return next(err);
+        bcrypt.hash(user.password, salt, function(err, hash) {
+            if (err) return next(err);
+            user.password = hash;
+            next();
+        });
+    });
+});
 
 
 //yukarıda arrow function kullansaydık this'i kullanamazdık.
